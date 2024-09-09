@@ -13,6 +13,7 @@ class stratum_chatter():
         self.worker_pass = worker_pass
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.count = 0
+        self.mining_data = Mining_data()
 
     def connect_to_pool(self):
         try:
@@ -42,9 +43,56 @@ class stratum_chatter():
             sys.exit()
 
         for response in responses:
-            # TODO: handle all the responsese
-            print(json.loads(response))
+            response = json.loads(response)
 
+            if response.get("method") == "client.get_version":
+                self.send_version(response)
+            elif response.get("method") == "client.reconnect":
+                self.receive_client_reconnect(response)
+                pass
+            elif response.get("method") == "client.show_message":
+                self.send_show_message(response)
+                pass
+            elif response.get("method") == "mining.notify":
+                self.receive_mining_notif(response)
+                pass
+            elif response.get("method") == "mining.set_difficulty":
+                self.receive_mining_diff(response)
+                pass
+            elif response.get("method") == "mining.set_extranonce":
+                self.receive_set_extranonce(response)
+                pass
+
+            print(response)
+
+    def send_version(self, request):
+        self.send_message({'id':request.get("id"), "result":"tratum_btc_miner/1.0", "error": None })
+
+    def send_show_message(self, request):
+        print(f'Incomming message from the server:\n{request.get("params")[0]}')
+        self.send_message({'id': request.get('id'), 'result': None, 'error': None})
+
+    def receive_mining_notif(self, request):
+        params = request.get('params')
+        self.mining_data = Mining_data(*params, self.mining_data.difficulty)
+        print("-------------- mining params set ----------------")
+        print(self.mining_data)
+        print("-------------------------------------------------")
+        self.send_message({'id': request.get('id'), 'result': None, 'error': None})
+
+    # TODO: Complete these two methods ---------------------------------------------
+    def receive_mining_diff(self, request):
+        self.mining_data.difficulty = request.get('params')[0]
+        self.send_message({"id": request.get('id'), 'result': None, 'error': None})
+
+    def receive_set_extranonce(self, request):
+        print("server asked to set a differetn difficulty")
+        self.send_message({"id": request.get('id'), 'result': None, 'error': None})
+
+    def receive_client_reconnect(self, request):
+        print("server asked for the client reconnect")
+        self.send_message({"id": request.get('id'), 'result': None, 'error': None})
+    # ------------------------------------------------------------------------------
 
     def subscribe_to_pool(self):
         subscribe_message = {
