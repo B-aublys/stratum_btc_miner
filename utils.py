@@ -13,5 +13,7 @@ class Mining_data():
     nTime: str = None
     clean_jobs: bool = None
     difficulty: int = None
+    extranonce1: str = None
+    extranonce2_zise: str = None
 
 

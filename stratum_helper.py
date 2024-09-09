@@ -18,9 +18,14 @@ class Stratum_chatter():
         self.worker_name = worker_name
         self.worker_pass = worker_pass
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.count = 0
         self.mining_data = Mining_data()
+
         self.sending_queue = Queue()
+        self.data_queue = Queue()
+
+        self.sending_process = None
+        self.receiving_process = None
+
 
     def connect_to_pool(self):
         try:
@@ -51,10 +56,17 @@ class Stratum_chatter():
             logging.error("The pool disconnected while waiting for a message")
             sys.exit()
 
+
+
         for response in responses:
             response = json.loads(response)
+            # If the mining ID is 1, that means it's replying to the subscbribe method with data
 
-            if response.get("method") == "client.get_version":
+            if response.get('id') == 1:
+                print(response.get('result'))
+                _, self.mining_data.extranonce1, self.mining_data.extranonce2_zise = response.get('result')
+
+            elif response.get("method") == "client.get_version":
                 self.send_version(response)
             elif response.get("method") == "client.reconnect":
                 self.receive_client_reconnect(response)
@@ -71,8 +83,8 @@ class Stratum_chatter():
             elif response.get("method") == "mining.set_extranonce":
                 self.receive_set_extranonce(response)
                 pass
-
-            print(response)
+            else:
+                print(response)
 
     def send_version(self, request):
         self.sending_queue.put({'id':request.get("id"), "result":"tratum_btc_miner/1.0", "error": None })
@@ -83,16 +95,20 @@ class Stratum_chatter():
 
     def receive_mining_notif(self, request):
         params = request.get('params')
-        self.mining_data = Mining_data(*params, self.mining_data.difficulty)
+        self.mining_data = Mining_data(*params,
+                                       self.mining_data.difficulty,
+                                       self.mining_data.extranonce1,
+                                       self.mining_data.extranonce2_zise)
+        self.data_queue.put(self.mining_data)
         self.sending_queue.put({'id': request.get('id'), 'result': None, 'error': None})
 
     def receive_mining_diff(self, request):
         self.mining_data.difficulty = request.get('params')[0]
         self.sending_queue.put({"id": request.get('id'), 'result': None, 'error': None})
 
-    # NOTE: this only needs to be supported if we tell the server we support it
+    # NOTE: this only needs to be supported if we tell the server we support it?
     def receive_set_extranonce(self, request):
-        print("received set_extrannonce!")
+        self.mining_data.extranonce1 = request.get('params')[0]
         self.sending_queue.put({"id": request.get('id'), 'result': None, 'error': None})
 
 
@@ -126,8 +142,19 @@ class Stratum_chatter():
         while True:
             self.receive_message()
 
-    # Returns sending queue
-    def start_process(self):
+
+    def kill(self):
+        self.data_queue.close()
+        self.sending_queue.close()
+
+        if self.sending_process:
+            self.sending_process.kill()
+            self.sending_process.join()
+        if self.receiving_process:
+            self.receiving_process.kill()
+            self.receiving_process.join()
+
+    def start(self):
         self.connect_to_pool()
         p_send = Process(target=self.send_messages)
         p_send.start()
@@ -138,7 +165,10 @@ class Stratum_chatter():
 
         p_receive = Process(target=self.receive_message_loop)
         p_receive.start()
-        return p_send, p_receive, self.sending_queue
+
+        self.sending_process = p_send
+        self.receiving_process = p_receive
+        return self.sending_queue, self.data_queue
 
 if __name__ == "__main__":
     chatter = Stratum_chatter("solo.ckpool.org", 3333, "1PKN98VN2z5gwSGZvGKS2bj8aADZBkyhkZ", "x")
