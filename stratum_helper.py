@@ -5,6 +5,9 @@ import sys
 
 from utils import *
 
+# TODO: maybe add support for extra_nonce?
+
+
 class stratum_chatter():
     def __init__(self, pool_address: str, pool_port: int, worker_name:str, worker_pass:str):
         self.pool_address = pool_address
@@ -80,15 +83,16 @@ class stratum_chatter():
         print("-------------------------------------------------")
         self.send_message({'id': request.get('id'), 'result': None, 'error': None})
 
-    # TODO: Complete these two methods ---------------------------------------------
     def receive_mining_diff(self, request):
         self.mining_data.difficulty = request.get('params')[0]
         self.send_message({"id": request.get('id'), 'result': None, 'error': None})
 
     def receive_set_extranonce(self, request):
-        print("server asked to set a differetn difficulty")
+
         self.send_message({"id": request.get('id'), 'result': None, 'error': None})
 
+
+    # TODO: Complete this method ---------------------------------------------------
     def receive_client_reconnect(self, request):
         print("server asked for the client reconnect")
         self.send_message({"id": request.get('id'), 'result': None, 'error': None})
