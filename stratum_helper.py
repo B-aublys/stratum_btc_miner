@@ -2,13 +2,16 @@ import socket
 import json
 import logging
 import sys
+import time
 
 from utils import *
 
+from multiprocessing import Process, Queue
 # TODO: maybe add support for extra_nonce?
+# TODO: lol remove the sys.exit and actually make error handling
+# NOTE: the usage of the sending queue for the inicialization sequence is... I don't like it?
 
-
-class stratum_chatter():
+class Stratum_chatter():
     def __init__(self, pool_address: str, pool_port: int, worker_name:str, worker_pass:str):
         self.pool_address = pool_address
         self.pool_port = pool_port
@@ -17,6 +20,7 @@ class stratum_chatter():
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.count = 0
         self.mining_data = Mining_data()
+        self.sending_queue = Queue()
 
     def connect_to_pool(self):
         try:
@@ -25,14 +29,16 @@ class stratum_chatter():
             logging.error(f"Connecting to the pool <{self.pool_address}:{self.pool_port}>: {e}")
             sys.exit()
 
-    def send_message(self, message:object):
-        message_json = json.dumps(message) + '\n'
+    def send_messages(self):
+        while True:
+            message = self.sending_queue.get(True)
+            message_json = json.dumps(message) + '\n'
 
-        try:
-            self.sock.sendall(message_json.encode('utf-8'))
-        except socket.error as e:
-            logging.error(f"Sending message to the pool: {e}")
-            sys.exit()
+            try:
+                self.sock.sendall(message_json.encode('utf-8'))
+            except socket.error as e:
+                logging.error(f"Sending message to the pool: {e}")
+                sys.exit()
 
     def receive_message(self):
         try:
@@ -69,31 +75,31 @@ class stratum_chatter():
             print(response)
 
     def send_version(self, request):
-        self.send_message({'id':request.get("id"), "result":"tratum_btc_miner/1.0", "error": None })
+        self.sending_queue.put({'id':request.get("id"), "result":"tratum_btc_miner/1.0", "error": None })
 
     def send_show_message(self, request):
         print(f'Incomming message from the server:\n{request.get("params")[0]}')
-        self.send_message({'id': request.get('id'), 'result': None, 'error': None})
+        self.sending_queue.put({'id': request.get('id'), 'result': None, 'error': None})
 
     def receive_mining_notif(self, request):
         params = request.get('params')
         self.mining_data = Mining_data(*params, self.mining_data.difficulty)
-        self.send_message({'id': request.get('id'), 'result': None, 'error': None})
+        self.sending_queue.put({'id': request.get('id'), 'result': None, 'error': None})
 
     def receive_mining_diff(self, request):
         self.mining_data.difficulty = request.get('params')[0]
-        self.send_message({"id": request.get('id'), 'result': None, 'error': None})
+        self.sending_queue.put({"id": request.get('id'), 'result': None, 'error': None})
 
     # NOTE: this only needs to be supported if we tell the server we support it
     def receive_set_extranonce(self, request):
         print("received set_extrannonce!")
-        self.send_message({"id": request.get('id'), 'result': None, 'error': None})
+        self.sending_queue.put({"id": request.get('id'), 'result': None, 'error': None})
 
 
     # TODO: Complete this method ---------------------------------------------------
     def receive_client_reconnect(self, request):
         print("server asked for the client reconnect")
-        self.send_message({"id": request.get('id'), 'result': None, 'error': None})
+        self.sending_queue.put({"id": request.get('id'), 'result': None, 'error': None})
     # ------------------------------------------------------------------------------
 
     def subscribe_to_pool(self):
@@ -103,7 +109,7 @@ class stratum_chatter():
         "params": []
         }
 
-        self.send_message(subscribe_message)
+        self.sending_queue.put(subscribe_message)
         return self.receive_message()
 
     def authorize_worker(self):
@@ -113,24 +119,27 @@ class stratum_chatter():
         "params": [self.worker_name, self.worker_pass]
         }
 
-        self.send_message(authorize_message)
+        self.sending_queue.put(authorize_message)
         return self.receive_message()
 
-    def start_operation(self):
-        # TODO: exception handling?
+    def receive_message_loop(self):
+        while True:
+            self.receive_message()
+
+    # Returns sending queue
+    def start_process(self):
         self.connect_to_pool()
+        p_send = Process(target=self.send_messages)
+        p_send.start()
+
         self.subscribe_to_pool()
+        time.sleep(2)
         self.authorize_worker()
 
-        while True:
-            try:
-                self.receive_message()
-            except InterruptedError:
-                self.sock.close()
-
-
-
+        p_receive = Process(target=self.receive_message_loop)
+        p_receive.start()
+        return p_send, p_receive, self.sending_queue
 
 if __name__ == "__main__":
-    chatter = stratum_chatter("solo.ckpool.org", 3333, "1PKN98VN2z5gwSGZvGKS2bj8aADZBkyhkZ", "x")
-    chatter.start_operation()
+    chatter = Stratum_chatter("solo.ckpool.org", 3333, "1PKN98VN2z5gwSGZvGKS2bj8aADZBkyhkZ", "x")
+    chatter.inicialise_pool()
