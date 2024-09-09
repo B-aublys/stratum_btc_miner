@@ -78,17 +78,15 @@ class stratum_chatter():
     def receive_mining_notif(self, request):
         params = request.get('params')
         self.mining_data = Mining_data(*params, self.mining_data.difficulty)
-        print("-------------- mining params set ----------------")
-        print(self.mining_data)
-        print("-------------------------------------------------")
         self.send_message({'id': request.get('id'), 'result': None, 'error': None})
 
     def receive_mining_diff(self, request):
         self.mining_data.difficulty = request.get('params')[0]
         self.send_message({"id": request.get('id'), 'result': None, 'error': None})
 
+    # NOTE: this only needs to be supported if we tell the server we support it
     def receive_set_extranonce(self, request):
-
+        print("received set_extrannonce!")
         self.send_message({"id": request.get('id'), 'result': None, 'error': None})
 
 
@@ -119,9 +117,10 @@ class stratum_chatter():
         return self.receive_message()
 
     def start_operation(self):
+        # TODO: exception handling?
         self.connect_to_pool()
-        recv = self.subscribe_to_pool()
-        recv = self.authorize_worker()
+        self.subscribe_to_pool()
+        self.authorize_worker()
 
         while True:
             try:
