@@ -14,7 +14,7 @@ class Miner:
         self.mining_processes = []
         self.reading_process = None
         self.mine_data = None
-        self.number_of_processes = 4
+        self.number_of_processes = NUMBER_OF_THREADS
 
     def start_mining(self):
         while True:
@@ -72,9 +72,7 @@ class Miner:
 
 
             if hashy < adjusted_target:
-                # TODO: send the message!!
-                print("found it")
-                print(hashy)
+                self.submit_found(nonce, extranonce2)
 
     def submit_found(self, nonce, extranonce2):
         # TODO: make the stratum helper handle IDs
