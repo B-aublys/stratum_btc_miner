@@ -1,0 +1,6 @@
+
+
+POOL_ADDR = 'solo.ckpool.org'
+POOL_PORT = 3333
+WORKER_NAME = 'mmc2SCNMJu99YT5BBww1GhHts2DdeewQyx'
+WORKER_PASS = 'x'

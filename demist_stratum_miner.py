@@ -1,9 +1,9 @@
 from stratum_helper import Stratum_chatter
 from miner import Miner
-
+from config import *
 
 if __name__ == "__main__":
-    stratum_chatter = Stratum_chatter("solo.ckpool.org", 3333, "1PKN98VN2z5gwSGZvGKS2bj8aADZBkyhkZ", "x")
+    stratum_chatter = Stratum_chatter(POOL_ADDR, POOL_PORT, WORKER_NAME, WORKER_PASS)
     sending_queue, data_queue = stratum_chatter.start()
 
     miner = Miner(sending_queue, data_queue)

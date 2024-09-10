@@ -3,8 +3,7 @@ from multiprocessing import Process, Queue, Pool
 import random
 import hashlib
 import binascii
-import time
-
+from config import *
 
 # TODO: create an actual multiprocess management for ending them
 
@@ -71,9 +70,17 @@ class Miner:
             hashy = hashlib.sha256(hashlib.sha256(binascii.unhexlify(blockheader)).digest()).digest()
             hashy = binascii.hexlify(hashy).decode()
 
+
             if hashy < adjusted_target:
+                # TODO: send the message!!
                 print("found it")
                 print(hashy)
+
+    def submit_found(self, nonce, extranonce2):
+        # TODO: make the stratum helper handle IDs
+        self.send_queue.put({"id":666 ,
+                             'method':'mining.submit',
+                             'params': [WORKER_NAME, self.mine_data.job_ID, extranonce2, self.mine_data.nTime, nonce]})
 
 
 
