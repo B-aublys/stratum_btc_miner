@@ -4,7 +4,7 @@
 This is a pure python Stratum protocol based BTC pool miner. Its true use is educational and not mining as it's super slow. Currently the project is still under heavy construction and there is much todo until it reaches it's full educational glory. If this project has helped you in any way shape of form please start it! ♥
 
 <!-- ![alt text](https://github.com/B-aublys/stratum_btc_miner/blob/main/picture/Leonardo_Phoenix_A_wispybearded_fire_wizard_with_a_fieryorange_1%20smaller.jpg?style=centerme) -->
-<img align="left" src="https://github.com/B-aublys/stratum_btc_miner/blob/main/picture/Leonardo_Phoenix_A_wispybearded_fire_wizard_with_a_fieryorange_1%20smaller.jpg">
+<img align="center" src="https://github.com/B-aublys/stratum_btc_miner/blob/main/picture/Leonardo_Phoenix_A_wispybearded_fire_wizard_with_a_fieryorange_1%20smaller.jpg">
 
 ## Roadmap
 
