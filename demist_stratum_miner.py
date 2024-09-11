@@ -1,6 +1,7 @@
 from stratum_helper import Stratum_chatter
 from miner import Miner
 from config import *
+import time
 
 if __name__ == "__main__":
     stratum_chatter = Stratum_chatter(POOL_ADDR, POOL_PORT, WORKER_NAME, WORKER_PASS)
@@ -9,11 +10,9 @@ if __name__ == "__main__":
     miner = Miner(sending_queue, data_queue)
     miner.start()
 
+    # try:
+    #     while True:
+    #         input("-------------- press [CTRL + C] to quit ---------------\n")
 
-    while True:
-        try:
-            input("-------------- [CTR + C] to quit ---------------\n")
-        except KeyboardInterrupt:
-            stratum_chatter.kill()
-            miner.kill()
-            break
+    # except KeyboardInterrupt as e:
+    #     print("Ending :)")
