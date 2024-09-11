@@ -10,9 +10,10 @@ This is a pure python Stratum protocol based BTC pool miner. Its true use is edu
 ## Roadmap
 
 * [ ]  Test the miner implementation on a testnet pool (requires self hosting)
-* [ ]  Implement better process handling
-    * [ ]  Clean closing all the threads when the program gets stopped
-    * [ ]  Each time new data gets sent from the server perhaps not restarting all the mining processes.
+* [x]  Add the Hash-Rate measurements
+* [x]  Implement better process handling
+    * [x]  Clean closing all the Processes when the program gets stopped
+    * [x]  Each time new data gets sent from the server perhaps not restarting all the mining processes.
 * [ ]  Create a better and more informative user interface
 * [ ]  Create diagrams explaining the structure of the code
 * [ ]  Create a youtube video explaining each step of the miner 😄
