@@ -7,6 +7,11 @@ This is a pure python Stratum protocol based BTC pool miner. Its true use is edu
   <img width=350 height=350 src="https://github.com/B-aublys/stratum_btc_miner/blob/main/picture/Leonardo_Phoenix_A_wispybearded_fire_wizard_with_a_fieryorange_1%20smaller.jpg">
 </p>
 
+How Powerful is your Wizard?
+<p align="center">
+  <img width=350 src="https://github.com/B-aublys/stratum_btc_miner/blob/main/picture/Wizzards%20power.png">
+</p>
+
 ## Roadmap
 
 * [ ]  Test the miner implementation on a testnet pool (requires self hosting)
