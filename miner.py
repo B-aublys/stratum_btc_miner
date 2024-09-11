@@ -27,11 +27,8 @@ class Miner:
         self.stop_manager_thread = False
 
 
-    # TODO: handle closing :)
     def start_mining(self):
         signal.signal(signal.SIGINT, self.kill)
-
-        # NOTE: might need to be switched to non-blocking
         new_miners = []
 
         for i in range(NUMBER_OF_THREADS):
@@ -49,11 +46,9 @@ class Miner:
             except QueueEmpty:
                 continue
 
-            # TODO: when new data is gotten send it to the miners :D
             for queue in self.miner_queues:
                 queue.put(self.mine_data)
 
-    # TODO: I know could be optimised by moving some stuff out, but this is python anyways xDDD
     def mine_coin(self, data_queue: Queue, stop_event):
         signal.signal(signal.SIGINT, lambda a, b: None)
 
