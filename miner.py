@@ -115,7 +115,7 @@ class Miner:
 
 
     def print_hashrate(self, hashrate):
-        print(f"The current Hash-Rate: [ \033[38;2;18;228;78m{hashrate/1000000:.2f} Ghz\033[0m ]")
+        print(f"The \033[38;2;110;5;196mWizard's\033[0m 🧙‍♂️ current power level: [ \033[38;2;18;228;78m{hashrate/1000000:.2f} GH/s\033[0m ]")
 
     def submit_found(self, nonce, extranonce2):
         self.send_queue.put({"id":666 ,
