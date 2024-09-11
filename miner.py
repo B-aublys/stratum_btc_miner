@@ -20,10 +20,11 @@ class Miner:
         self.receive_queue = receive_queue
         self.mining_processes = []
         self.miner_queues = []
+        self.miner_stop_events = []
         self.reading_process = None
         self.mine_data = None
         self.number_of_processes = NUMBER_OF_THREADS
-        self.exit_event = Event()
+        self.stop_manager_thread = False
 
 
     # TODO: handle closing :)
@@ -35,13 +36,14 @@ class Miner:
 
         for i in range(NUMBER_OF_THREADS):
             self.miner_queues.append(Queue())
-            new_miner = Process(target=self.mine_coin, args=[self.miner_queues[-1]])
+            self.miner_stop_events.append(Event())
+            new_miner = Process(target=self.mine_coin, args=[self.miner_queues[-1], self.miner_stop_events[-1]])
             new_miner.start()
             new_miners.append(new_miner)
 
         self.mining_processes = new_miners
 
-        while not self.exit_event.is_set():
+        while not self.stop_manager_thread:
             try:
                 self.mine_data: Mining_data = self.receive_queue.get(False)
             except QueueEmpty:
@@ -52,10 +54,10 @@ class Miner:
                 queue.put(self.mine_data)
 
     # TODO: I know could be optimised by moving some stuff out, but this is python anyways xDDD
-    def mine_coin(self, data_queue: Queue):
+    def mine_coin(self, data_queue: Queue, stop_event):
         signal.signal(signal.SIGINT, lambda a, b: None)
 
-        while not self.exit_event.is_set():
+        while not stop_event.is_set():
             try:
                 mine_data = data_queue.get(False)
             except QueueEmpty:
@@ -78,7 +80,7 @@ class Miner:
                 # little endian
                 merkle_root = ''.join([merkle_root[i] + merkle_root[i + 1] for i in range(0 , len(merkle_root) , 2)][: :-1])
 
-                while not self.exit_event.is_set() and data_queue.empty():
+                while not stop_event.is_set() and data_queue.empty():
                     nonce = hex(random.randint(0 , 2 ** 32 - 1))[2 :].zfill(8)  # nNonce   #hex(int(nonce,16)+1)[2:]
                     blockheader = mine_data.btc_block_version + \
                                 mine_data.prev_HASH + \
@@ -108,6 +110,9 @@ class Miner:
         self.reading_process = reading_p
 
     def kill(self, signal, frame):
-        self.exit_event.set()
+        self.stop_manager_thread = True
+        for event in self.miner_stop_events:
+            event.set()
+
         for process in self.mining_processes:
                 process.join()
