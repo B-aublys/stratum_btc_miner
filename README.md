@@ -48,7 +48,7 @@ Clone the repo, configure your own settings in `/config.py` file and run:
 Here is a diagram representing all the processes, classes and their interaction between each other! All the colored blocks are processes that run continuesly throughout the execution of the program.
 
 <p align="center">
-  <img width=400 src="https://github.com/B-aublys/stratum_btc_miner/blob/main/picture/Software_Diagram.png">
+  <img src="https://github.com/B-aublys/stratum_btc_miner/blob/main/picture/Software_diagram2.png">
 </p>
 <p align="center">
   https://excalidraw.com/#json=X4kG-XapCy7Zmb1supaOb,cY05_F5dvvUpeuprZP8IIQ
