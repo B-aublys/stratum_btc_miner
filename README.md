@@ -51,7 +51,7 @@ Here is a diagram representing all the processes, classes and their interaction 
   <img src="https://github.com/B-aublys/stratum_btc_miner/blob/main/picture/Software_diagram2.png">
 </p>
 <p align="center">
-  https://excalidraw.com/#json=X4kG-XapCy7Zmb1supaOb,cY05_F5dvvUpeuprZP8IIQ
+  <a href="https://excalidraw.com/#json=X4kG-XapCy7Zmb1supaOb,cY05_F5dvvUpeuprZP8IIQ">Link to diagram</a>
 </p>
 
 🚧 The rest of the documentation is under construction! 🏗
