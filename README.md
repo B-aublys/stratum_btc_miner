@@ -22,7 +22,7 @@ This is a pure python Stratum protocol based BTC pool miner. Its true use is edu
     * [x]  Clean closing all the Processes when the program gets stopped
     * [x]  Each time new data gets sent from the server perhaps not restarting all the mining processes.
 * [ ]  Create a better and more informative user interface
-* [ ]  Create diagrams explaining the structure of the code
+* [x]  Create diagrams explaining the structure of the code
 * [ ]  Create a youtube video explaining each step of the miner 😄
 * [ ]  GPU acceleration!
 
@@ -48,10 +48,10 @@ Clone the repo, configure your own settings in `/config.py` file and run:
 Here is a diagram representing all the processes, classes and their interaction between each other! All the colored blocks are processes that run continuesly throughout the execution of the program.
 
 <p align="center">
-  <img src="https://github.com/B-aublys/stratum_btc_miner/blob/main/picture/Software_diagram2.png">
+  <img src="https://github.com/B-aublys/stratum_btc_miner/blob/main/picture/software_diagram_3.png">
 </p>
 <p align="center">
-  <a href="https://excalidraw.com/#json=X4kG-XapCy7Zmb1supaOb,cY05_F5dvvUpeuprZP8IIQ">Link to diagram</a>
+  <a href="https://excalidraw.com/#json=SN-UlHm-8KG2uUP0rmerS,rSySdj3YeKciMCf0slqznA">Link to diagram</a>
 </p>
 
 🚧 The rest of the documentation is under construction! 🏗

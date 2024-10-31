@@ -76,7 +76,7 @@ class Miner:
                 iteration = 0
             else:
                 continue
-
+            
             if mine_data.job_ID:
                 target = (mine_data.nBits[2 :] + '00' * (int(mine_data.nBits[:2] , 16) - 3)).zfill(64)
                 adjusted_target = hex(int(target, 16)*mine_data.difficulty)[2:].zfill(64)
